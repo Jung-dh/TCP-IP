@@ -1,0 +1,36 @@
+using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+
+class TCPServer
+{
+    static void Main(string[] args)
+    {
+        // 서버 소켓 생성
+        TcpListener serverSocket = new TcpListener(IPAddress.Any, 8888);
+        TcpClient clientSocket = default(TcpClient);
+        serverSocket.Start();
+        Console.WriteLine("서버가 시작되었습니다.");
+
+        try
+        {
+            while (true)
+            {
+                clientSocket = serverSocket.AcceptTcpClient(); // 클라이언트 연결 대기
+                byte[] bytesFrom = new byte[1024];
+                NetworkStream networkStream = clientSocket.GetStream();
+                networkStream.Read(bytesFrom, 0, bytesFrom.Length); // 클라이언트로부터 메시지 수신
+                string dataFromClient = Encoding.ASCII.GetString(bytesFrom);
+                dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$")); // 메시지 끝 부분 제거
+                Console.WriteLine("클라이언트로부터 수신된 메시지: " + dataFromClient);
+                networkStream.Close();
+                clientSocket.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("오류: " + ex.Message);
+        }
+    }
+}
