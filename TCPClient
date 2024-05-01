@@ -1,0 +1,25 @@
+using System;
+using System.Net.Sockets;
+using System.Text;
+
+class TCPClient
+{
+    static void Main(string[] args)
+    {
+        try
+        {
+            TcpClient clientSocket = new TcpClient("127.0.0.1", 8888); // 서버에 연결
+            NetworkStream networkStream = clientSocket.GetStream();
+            Console.Write("전송할 메시지를 입력하세요: ");
+            string message = Console.ReadLine();
+            byte[] bytesToSend = Encoding.ASCII.GetBytes(message + "$"); // 메시지 끝 부분에 "$" 추가
+            networkStream.Write(bytesToSend, 0, bytesToSend.Length); // 메시지 전송
+            networkStream.Close();
+            clientSocket.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("오류: " + ex.Message);
+        }
+    }
+}
